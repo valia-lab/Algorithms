@@ -45,11 +45,13 @@ struct set{
 int find(struct set uf[], int u){
 
       list<int> path;
-      if(uf[u].parent == u) return u;
+
+      if(uf[u].parent == u) return u;     //root
       else while(uf[u].parent != u){
         path.push_back(u);
         u = uf[u].parent;
       }
+    //  printf("u is %d\n", u);
       //path compression
       for(const auto& p : path)
           uf[p].parent = u;
@@ -62,19 +64,20 @@ void Union(struct set uf[], int u, int v, int w){
   int pu = find(uf, u), pv = find(uf, v);
   int ranku = uf[pu].rank, rankv = uf[pv].rank;
   if(ranku > rankv){
+     uf[pv].real_parent = pu;
      uf[pv].parent = pu;
      uf[pv].w = w;
-     uf[pu].rank ++;
   }
   else if(ranku<rankv){
-    uf[pu].parent = pv;
+    uf[pu].real_parent = pv;
+    uf[pv].parent = pv;
     uf[pu].w = w;
   }
   else{ //if they have the same rank choose pv as  parent and increase rank
     uf[pu].parent = pv;
     uf[pu].w = w;
     uf[pv].rank++;
-    if(uf[pu].real_parent<0) //first time we see an edge involving pu
+    if(uf[pu].real_parent==0) //first time we see an edge involving pu
         uf[pu].real_parent = pv;
   }
 }
@@ -84,17 +87,19 @@ int main(int argc, char **argv){
     infile.open(argv[1]);
     int N, M, i;
     infile >> N >> M;
+    cout<<N<<M<<endl;
     int C[N+1];
     C[0] = -1 ;//dummy
     struct set uf[N]; //Union find
     for(i=1; i<N+1; i++){
+  //    cout<<i<<" ";
         infile>>C[i];
         uf[i].parent = i;     //initiliase Union find
-        uf[i].real_parent = -1;
+        uf[i].real_parent = 0;
         uf[i].rank = 0;
         uf[i].w = 0;
     }
-
+  //  cout<<"\n";
     infile.get();
     tuple<int, int, int> portal[M];
     int t1, t2, w;
@@ -108,13 +113,14 @@ int main(int argc, char **argv){
     /*for(int i=1; i<N+1; i++)
         printf("%d ", C[i]);
         printf("\n");*/
-    tuple_quicksort(portal, 0, M);       //sort portals by length
+    tuple_quicksort(portal, 0, M-1);       //sort portals by length
     int u,v;
     for(i=M-1; i>=0; i--){             // examine portals in descending order
+      cout<<uf[i].w<<endl;
       u = get<1>(portal[i]);
       v = get<2>(portal[i]);
       if(find(uf, u) != find(uf, v))
-          Union(uf, u, v, get<0>(portal[i]) );
+            Union(uf, u, v, get<0>(portal[i]) );
     }
     printf("ok\n");
     int mini;
@@ -126,8 +132,11 @@ int main(int argc, char **argv){
     printf("(node, parent, w, rank) = %d %d %d %d\n", i, uf[i].parent, uf[i].w, uf[i].rank);
        //printf("%d ", uf[i].parent);
     printf("\n");
-
+    printf("%d\n", find(uf, 3));
+    printf("%d\n", find(uf, 4));
+    return 0;
     ///////////////////////
+    /*
     for(i=1; i<N+1; i++){
       printf("edge number %d ", i);
       if(C[i]!= i){
@@ -162,6 +171,7 @@ int main(int argc, char **argv){
     }
     printf("res is %d\n", res);
     return 0;
+    */
 
 }
 //1) diavase N.M
