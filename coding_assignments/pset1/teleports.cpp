@@ -7,7 +7,7 @@
 using namespace std;
 ifstream infile;
 
-int tuple_partition(tuple<int, int, int> a[], int first, int last){
+int tuple_partition(tuple<int, int, int> *a, int first, int last){
 
     if(first>=last) return last;
     int left = first;
@@ -18,16 +18,13 @@ int tuple_partition(tuple<int, int, int> a[], int first, int last){
       while(get<0>(a[right])> pivot && right>left) right--;
       if(left>=right) return right;
       swap(a[left], a[right]);
-      /*for(int i=0; i<6; i++)
-          cout<<a[i]<<" ";
-      cout<<endl;*/
       left++;
       right--;
   }
   return right;
 }
 
-void tuple_quicksort(tuple<int, int, int> a[], int first, int last){
+void tuple_quicksort(tuple<int, int, int> *a, int first,int last){
 
   if(first>=last) return;
   int limit = tuple_partition(a, first, last);
@@ -35,14 +32,14 @@ void tuple_quicksort(tuple<int, int, int> a[], int first, int last){
   tuple_quicksort(a, limit+1, last);
 }
 
-struct set{
+struct Set{
   int parent;
   int real_parent;
   int rank;
   int w;            //length of portal that connects with parent
 };
 
-int find(struct set uf[], int u){
+int find(struct Set *uf, int u){
 
       list<int> path;
 
@@ -51,16 +48,17 @@ int find(struct set uf[], int u){
         path.push_back(u);
         u = uf[u].parent;
       }
-    //  printf("u is %d\n", u);
+
       //path compression
       for(const auto& p : path)
           uf[p].parent = u;
       /*...........................................*/
+      path.clear();
       return u;
 }
 
 
-void Union(struct set uf[], int u, int v, int w){
+void Union(struct Set *uf, int u, int v, int w){
   int pu = find(uf, u), pv = find(uf, v);
   int ranku = uf[pu].rank, rankv = uf[pv].rank;
   if(ranku > rankv){
@@ -70,7 +68,7 @@ void Union(struct set uf[], int u, int v, int w){
   }
   else if(ranku<rankv){
     uf[pu].real_parent = pv;
-    uf[pv].parent = pv;
+    uf[pu].parent = pv;
     uf[pu].w = w;
   }
   else{ //if they have the same rank choose pv as  parent and increase rank
@@ -87,10 +85,11 @@ int main(int argc, char **argv){
     infile.open(argv[1]);
     int N, M, i;
     infile >> N >> M;
-    cout<<N<<M<<endl;
-    int C[N+1];
-    C[0] = -1 ;//dummy
-    struct set uf[N]; //Union find
+//    cout<<N<<M<<endl;
+    int *C = new int[N+1];
+    C[0] = -1;//dummy
+
+    Set *uf = new Set[N+1];
     for(i=1; i<N+1; i++){
   //    cout<<i<<" ";
         infile>>C[i];
@@ -99,9 +98,10 @@ int main(int argc, char **argv){
         uf[i].rank = 0;
         uf[i].w = 0;
     }
+
   //  cout<<"\n";
     infile.get();
-    tuple<int, int, int> portal[M];
+    tuple<int, int, int> *portal = new tuple<int, int, int>[M];
     int t1, t2, w;
     for(i=0; i<M; i++){
       infile>>t1>>t2>>w;
@@ -109,36 +109,24 @@ int main(int argc, char **argv){
     }
     infile.close();
 
-    //debug
-    /*for(int i=1; i<N+1; i++)
-        printf("%d ", C[i]);
-        printf("\n");*/
     tuple_quicksort(portal, 0, M-1);       //sort portals by length
     int u,v;
     for(i=M-1; i>=0; i--){             // examine portals in descending order
-      cout<<uf[i].w<<endl;
       u = get<1>(portal[i]);
       v = get<2>(portal[i]);
-      if(find(uf, u) != find(uf, v))
-            Union(uf, u, v, get<0>(portal[i]) );
+      if(find(uf, u) != find(uf, v)){
+            Union(uf, u, v, get<0>(portal[i]));
+      }
     }
-    printf("ok\n");
+
     int mini;
     int max = get<0>(portal[M-1]) +1;
     int res = max;
     int q, flag, root, edge;
-    ////////////////////////
-    for(int i=1; i<N+1; i++)
-    printf("(node, parent, w, rank) = %d %d %d %d\n", i, uf[i].parent, uf[i].w, uf[i].rank);
-       //printf("%d ", uf[i].parent);
-    printf("\n");
-    printf("%d\n", find(uf, 3));
-    printf("%d\n", find(uf, 4));
-    return 0;
-    ///////////////////////
-    /*
+
+
     for(i=1; i<N+1; i++){
-      printf("edge number %d ", i);
+    //  printf("edge number %d ", i);
       if(C[i]!= i){
         q = C[i];
         flag = 0;
@@ -156,7 +144,7 @@ int main(int argc, char **argv){
               break;
           }
        }
-       printf("ok2\n");
+  //     printf("ok2\n");
        if(flag){  //compute path from i to root == path from root to i
          q = i;
          while(q!=root){ //find path from i to root , and the min portal length in this path
@@ -169,17 +157,8 @@ int main(int argc, char **argv){
 
       if(mini<res) res = mini;        //compare with results for other paths
     }
-    printf("res is %d\n", res);
+    cout<<res<<endl<<flush;
     return 0;
-    */
+
 
 }
-//1) diavase N.M
-//2) apothikefse se enan pinaka C[n+1] ti thesis ci tou morty i
-//3) diavase M grammes sundeseon :
-//4) taxinomisi sundeseon
-//5) gia kathe sundesi u, v pou diavazeis:
-//6) an find(u)!=find(v) --> Union
-//7) alliws agnoise tin sundesi
-//8) gia kathe ci, vres to min(wj) stin diadromi ci->i . POS VRISKO TIN DIADROMII? sunartisi
-//9) gurna to min(min(wj))
