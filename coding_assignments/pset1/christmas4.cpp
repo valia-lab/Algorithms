@@ -16,6 +16,7 @@ int main(int argc, char **argv){
     int temp, mini = K+1;
     infile>>pref[1];
     vector<int> q;
+    q.push_back(-1);
 
     for(int i=2; i<N+1; i++){
         infile>>temp;
@@ -26,25 +27,29 @@ int main(int argc, char **argv){
         pref[i] = pref[i-1]+temp;
         if(pref[i]<K)
             q.push_back(pref[i]);
-        if(pref[i]==K && i < mini)
+        if(pref[i]==K && i < mini){
             mini = i;
+            //cout<<i<<endl;
+        }
     }
     infile.close();
-    return 0;
+
     vector<vector<int>> S;
     S.reserve(N+1);
     S.push_back({});
     S.push_back(q);     //contains s(1,j) for all j
 
+    return 0;
     //produce s(i,j)'s
     for(int i=1; i<N; i++){
         vector<int> s;
         for(int j=i+1; j<N+1; j++){
-          temp = pref[j]-pref[i]
+          temp = pref[j]-pref[i];
           if(temp<K)
             s.push_back(temp);
           else if(temp==K){
             mini = min(mini, j - i + 1);
+          //  cout<<i<<" "<<j<<endl;
             break;                        //s(i,j+1)>s(i,j) >K
         }
       }
@@ -65,20 +70,26 @@ int main(int argc, char **argv){
 /*.................................................................................*/
     for(int y = N-3; y>0; y--){               //search s(x,y) with fixed y for all y
         //.......create array with nums = {1,..,K}
-        for(int j = y+1; j<N+1; j++){ //O(n)
+        for(int j = y+1; j<(S[y+1]).end()+1; j++){ //O(n)
             m = S[y+1][j];
             if(m<=K && (j-y <nums[m]))
-                nums[m] = j - y + 1;
+                nums[m] = j - y ;
 
         }
         //............check all s(i,y) with y fixed ....................
-        for(int i = 1; i<y; i++){
+        for(int i = 1; i<S[i].end(); i++){
+            if(i = y) break;
             temp = K-S[i][y];
-            if(nums[temp] > 0)        //if K-s[i][y] exists right of y
+            if(nums[temp] > 0){       //if K-s[i][y] exists right of y
+              //  cout<<i<<" "<<y<endl;
+              //  cout<<nums[temp]<<end;
                 mini = min(nums[temp] + y - i + 1, mini);
+            }
         }
     }
-    cout<<mini<<flush<<endl;
+    if(mini<K+1)
+        cout<<mini<<flush<<endl;
+    else cout<<-1<<endl;
     delete [] nums;
     return 0;
 }
