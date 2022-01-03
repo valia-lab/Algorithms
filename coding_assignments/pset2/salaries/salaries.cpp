@@ -58,11 +58,11 @@ int find_lis(long long int a[], int n, long long int *l){
           l[i] = 1;
         }
       }
-/*    printf("after inserting a[ %d %s\n", i, "]");
+/*printf("after inserting a[ %d %s\n", i, "]");
     for(const auto& x: subseqs)
          printf("%d ", x);
-      putchar('\n');
-*/
+      putchar('\n');*/
+
 
     }
     return subseqs.size()-1;
@@ -90,8 +90,7 @@ int find_lds(long long int a[], int n, long long int *r){
         else{
           from = 1;
           to = back-1;
-          if(to<from)
-        //  cout<<"maxi is"<<maxi<<endl;
+
           while(from <= to && repeat<2){           //binary search to find the lis a[i] extends
             pivot = from  + (to-from)/2;
             if(subseqs[pivot]==a[i]){ //a[i] won't extend any lis
@@ -122,12 +121,12 @@ int find_lds(long long int a[], int n, long long int *r){
             r[i] = 1;
           }
         }
-    /*  printf("after inserting a[ %d %s\n", i, "]");
+  /*  printf("after inserting a[ %d %s\n", i, "]");
       for(const auto& x: subseqs)
            printf("%d ", x);
-        putchar('\n');
-      }
-  */  }
+        putchar('\n');*/
+
+   }
 
       return subseqs.size()-1;
   }
@@ -162,21 +161,17 @@ putchar('\n');*/
   if(K>0 && res!=N){
      find_lds(a, N, r);
       //
-for(int i=1; i<N+1; i++)
+/*for(int i=1; i<N+1; i++)
          cout<<" "<<l[i];
       putchar('\n');
       for(int i=1; i<N+1; i++)
          cout<<" "<<r[i];
-      putchar('\n');
+      putchar('\n');*/
       //
       //check for compatible
       for(int y = 1; y<N; y++){
-          if(y==45){
-          cout<<l[y]+ r[y+1]<<endl;
-        }
           if(a[y]<a[y+1] || (a[y]-a[y+1]<K)){ //if the start of left lis is small enough
               len = l[y] + r[y+1];
-              cout<<"y is "<<y<<"and len is "<<len<<endl;
               if(len > res)
                   res =len;
           }
