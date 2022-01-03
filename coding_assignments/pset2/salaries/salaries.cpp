@@ -47,7 +47,7 @@ int find_lis(long long int a[], int n, long long int *l){
         }
         /*............end of bsearch .....................................*/
         if(dual)
-            l[i] = 1;
+            l[i] = l[pivot];
         else if(!mini ){
             j = to;
             subseqs[j+1] = a[i];
@@ -111,7 +111,7 @@ int find_lds(long long int a[], int n, long long int *r){
            }
           /*............end of bsearch .....................................*/
           if(dual)
-              r[i] = 1;
+              r[i] = r[pivot];
           else if(!maxi ){
               j = to;
               subseqs[j+1] = a[i];
@@ -162,24 +162,29 @@ putchar('\n');*/
   if(K>0 && res!=N){
      find_lds(a, N, r);
       //
-/*for(int i=1; i<N+1; i++)
+for(int i=1; i<N+1; i++)
          cout<<" "<<l[i];
       putchar('\n');
       for(int i=1; i<N+1; i++)
          cout<<" "<<r[i];
-      putchar('\n');*/
+      putchar('\n');
       //
       //check for compatible
       for(int y = 1; y<N; y++){
+          if(y==45){
+          cout<<l[y]+ r[y+1]<<endl;
+        }
           if(a[y]<a[y+1] || (a[y]-a[y+1]<K)){ //if the start of left lis is small enough
               len = l[y] + r[y+1];
+              cout<<"y is "<<y<<"and len is "<<len<<endl;
               if(len > res)
                   res =len;
           }
       }
   }
   printf("%d\n", res);
-
+  //cout<<l[9]<<endl;
+//  cout<<r[10]<<endl;
   time(&tend);
   double time_taken = double(tend - start);
   if(time_taken>1)
