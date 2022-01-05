@@ -192,7 +192,7 @@ for(int i=1; i<N+1; i++)
            to = subseqs.size()-1;
            while(from<to){
              pivot = from + (to-from)/2;
-             if(i>1 && (a[i-1]<subseqs[pivot]) || (a[i-1] - subseqs[pivot]<K)) //compatible
+             if(i>1 && (a[y]<subseqs[pivot]) || (a[y] - subseqs[pivot]<K)) //compatible
                  from = pivot;
              else to = pivot;
            }
