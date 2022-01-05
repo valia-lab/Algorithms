@@ -6,7 +6,7 @@ using namespace std;
 #include <bits/stdc++.h>
 time_t start, tend;
 
-int find_lis(long long int a[], int n, long long int *l){
+int find_lis(long long int a[], long int n, long long int *l){
 
     l[1] = 1;
     vector<int> subseqs;    // holds the last added element to each increasing subseq
@@ -68,13 +68,13 @@ int find_lis(long long int a[], int n, long long int *l){
     return subseqs.size()-1;
 }
 
-int find_lds(long long int a[], int n, long long int *r){
+int find_lds(long long int a[], long int n, long long int *r, int K){
 
       r[1] = 1;
       vector<int> subseqs;    // holds the last added element to each increasing subseq
       subseqs.push_back(-1); //dummy push to have vector index base = 1
       subseqs.push_back(a[n]);
-      int back, maxi, dual, repeat = 0;
+      int back, maxi, dual, repeat = 0, flag;
       int pivot, from, to, j;
       for(int i =n; i>0; i--){
         //scan subseqs by decreasing size
@@ -82,11 +82,13 @@ int find_lds(long long int a[], int n, long long int *r){
         maxi = 1;
         dual = 0;
         repeat = 0;
+        flag = 0;
         //printf("%d %lld\n", subseqs[back], a[i]);
-        if(subseqs[back] > a[i]){     //if a[i] etxends longest subseq
+        if(subseqs[back] > a[i]){    //if a[i] etxends longest subseq
           subseqs.push_back(a[i]);
-          r[i] = back+1;
+          flag = 1;
         }
+
         else{
           from = 1;
           to = back-1;
@@ -114,28 +116,40 @@ int find_lds(long long int a[], int n, long long int *r){
           else if(!maxi ){
               j = to;
               subseqs[j+1] = a[i];
-              r[i] = j+1;    //length of lds ending in a[i]
           }
-          else {             //in case a[i] is minimum in a[1..i]
-            subseqs[1]=a[i];
-            r[i] = 1;
-          }
-        }
+          else
+            subseqs[1] = a[i];
+
+          //r[i]= length of longest compatible between a[i-1] & a[i] seq
+         if(flag && (a[i-1]<a[i]) || (a[i-1] - a[i]<K))
+             r[i] = back+1;
+         else{
+           from = 1;
+           to = subseqs.size()-1;
+           while(from<to){
+             pivot = from + (to-from)/2;
+             if((a[i-1]<a[pivot]) || (a[i-1] - a[pivot]<K)) //compatible
+                 from = pivot;
+             else to = pivot;
+           }
+           r[i] = r[pivot];
+         }
+
   /*  printf("after inserting a[ %d %s\n", i, "]");
       for(const auto& x: subseqs)
            printf("%d ", x);
         putchar('\n');*/
 
-   }
-
+       }
+ }
       return subseqs.size()-1;
   }
 
 int main(){
   /*.............reading ...................*/
   time(&start);
-  int N, K;
-  scanf("%d %d", &N, &K);
+  long int N, K;
+  scanf("%ld %ld", &N, &K);
 
   long long int *a = new long long int[N+1];
   long long int *l = new long long int[N+1];
@@ -144,7 +158,7 @@ int main(){
   l[0] = -1;
   r[0] = -1;
 
-  for(int i=1; i<N+1; i++){
+  for(long int i=1; i<N+1; i++){
       scanf("%lld ", &a[i]);
   }
   getchar();
@@ -159,7 +173,7 @@ putchar('\n');*/
   int res ,len;
   res = find_lis(a, N, l);
   if(K>0 && res!=N){
-     find_lds(a, N, r);
+     find_lds(a, N, r, K);
       //
 /*for(int i=1; i<N+1; i++)
          cout<<" "<<l[i];
@@ -169,6 +183,7 @@ putchar('\n');*/
       putchar('\n');*/
       //
       //check for compatible
+      int pivot , left, right, repeat;
       for(int y = 1; y<N; y++){
           if(a[y]<a[y+1] || (a[y]-a[y+1]<K)){ //if the start of left lis is small enough
               len = l[y] + r[y+1];
@@ -176,7 +191,7 @@ putchar('\n');*/
                   res =len;
           }
       }
-  }
+   }
   printf("%d\n", res);
   //cout<<l[9]<<endl;
 //  cout<<r[10]<<endl;
