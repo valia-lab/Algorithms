@@ -130,35 +130,6 @@ int find_lds(long long int a[], long int n, long long int *r, int K){
           else
             subseqs[1] = a[i];
 
-          //r[i]= length of longest compatible between a[i-1] & a[i] seq
-         if(flag && i>1 &&((a[i-1]<a[i]) || (a[i-1] - a[i]<K))){
-             r[i] = back+1;
-             printf("a[i-1] = %lld is compatible with a[i] =%lld\n", a[i-1], a[i]);
-         }
-         else if(back==1){
-           if(a[i-1] <a[i] || a[i-1]-a[i]<K)
-               r[i] = 1;
-           else r[i] = 0;
-         }
-         else{
-           ///......binary search in subseqs[] to find right most element
-           //.......that is compatible with a[i-1]......................
-           from = 1;
-           to = subseqs.size()-1;
-           for(const auto& x: subseqs)
-                printf("%d ", x);
-             putchar('\n');
-
-           while(from<to){
-             pivot = from + (to-from)/2;
-             if(i>1 && (a[i-1]<subseqs[pivot]) || (a[i-1] - subseqs[pivot]<K)) //compatible
-                 from = pivot;
-             else to = pivot;
-           }
-           printf("i is %d and pivot is %d\n", i, pivot);
-           r[i] = r[pivot];
-         }
-
   /*  printf("after inserting a[ %d %s\n", i, "]");
       for(const auto& x: subseqs)
            printf("%d ", x);
@@ -214,6 +185,26 @@ for(int i=1; i<N+1; i++)
               if(len > res)
                   res =len;
           }
+          else{
+           ///......binary search in subseqs[] to find right most element
+           //.......that is compatible with a[i-1]......................
+           from = 1;
+           to = subseqs.size()-1;
+           while(from<to){
+             pivot = from + (to-from)/2;
+             if(i>1 && (a[i-1]<subseqs[pivot]) || (a[i-1] - subseqs[pivot]<K)) //compatible
+                 from = pivot;
+             else to = pivot;
+           }
+           r[y+1] = r[pivot];
+         }
+         len = l[y] + r[y+1];
+         if(len > res)
+             res =len;
+      }
+
+  /*  printf("after inserting a[ %d %s\n", i, "]");
+      for(const auto& x: subseqs)
       }
    }
   printf("%d\n", res);
