@@ -209,7 +209,7 @@ for(int i=1; i<N+1; i++)
    }
   printf("%d\n", res);
   //cout<<l[9]<<endl;
-//  cout<<r[10]<<endl;
+//  cout<<r[10]<<endl;*/
   time(&tend);
   double time_taken = double(tend - start);
   if(time_taken>1)
