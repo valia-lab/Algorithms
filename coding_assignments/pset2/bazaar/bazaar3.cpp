@@ -4,6 +4,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 time_t start, tend;
+long int MAXCOST=1;
 
 int solve(vector<vector<long int>> &T, vector<tuple<long int, long int>> offers, long int maxi, long int N){
 
@@ -13,7 +14,6 @@ int solve(vector<vector<long int>> &T, vector<tuple<long int, long int>> offers,
     long int n1 = offers.size()-1;      //amount of offers of type 1A
     tuple<long int, long int> t1 = offers[1];       //cheapest 1A
     long int n1A = get<1>(t1);    //amount of cheapest 1A
-    cout<<n1A<<endl;
 
     for(int i= 0; i<n1+1; i++){
         vector<long int> vec;
@@ -37,15 +37,15 @@ int solve(vector<vector<long int>> &T, vector<tuple<long int, long int>> offers,
     int amount = n1A;
     for(int i = 2; i<n1+1; i++){
         temp = offers[i];
-        k=2;
+        k = 2;
         r = get<1>(temp);                  //i-th offer amount
-        amount+=r;
-        while(k<=N){
+        amount += r;
+        while(k <= N){
             if(k > amount){
                 T[i].push_back(maxi+1);      //we can't buy that much we that set of offers
                 k++;
             }
-            else if(k-r>0){
+            else if(k - r > 0){
                 T[i].push_back(min(T[i-1][k], T[i-1][k-get<1>(temp)] + get<0>(temp)));
                 k++;
 
@@ -53,7 +53,7 @@ int solve(vector<vector<long int>> &T, vector<tuple<long int, long int>> offers,
             else{
                                   //if r>k then the i-th itself is enough for k
                 T[i].push_back(min(T[i-1][k], get<0>(temp)));
-                if(T[i][k]!=T[i-1][k]){             //fill T(i,j) for j = k+1, .., r
+                if(T[i][k]!= T[i-1][k]){             //fill T(i,j) for j = k+1, .., r
                     temp2 = k++;
                     temp3 = T[i][k];
                     while(temp2++ < r){
@@ -70,7 +70,7 @@ int solve(vector<vector<long int>> &T, vector<tuple<long int, long int>> offers,
     return amount;
 }
 
-void supplier(vector<long int> &T, int supplier, vector<vector<tuple<long int, long int>>> offers, long int maxi, long int N){
+long int supplier(vector<long int> &T, int supplier, vector<vector<tuple<long int, long int>>> offers, long int maxi, long int N){
       int amount;
       vector<vector<long int>> TA;
       vector<vector<long int>> TB;
@@ -78,11 +78,14 @@ void supplier(vector<long int> &T, int supplier, vector<vector<tuple<long int, l
       amount = solve(TA, offers[0], maxi, N);
       amount = min(amount, solve(TB, offers[1], maxi, N));
       amount = min(amount, solve(TC, offers[2], maxi, N));
-    //  T.push_back(0);
+
       for(int i = 1; i < amount + 1; i++){
           T.push_back(TA[offers[0].size()-1][i] + TB[offers[1].size()-1][i] + TC[offers[2].size()-1][i]);
-          cout<<T[i]<<endl;
       }
+      for(int i = amount+1; i < N +1; i++){
+          T.push_back(MAXCOST);         //infty
+      }
+      return amount;
 }
 
 int main(){
@@ -104,9 +107,11 @@ int main(){
 
     long int n, cost, n1 = 0, m1 = 0, m2=0, m3 = 0;
     char m[3];
-    /* 'A' ~ 0 , 'B' ~ 1, 'C' ~2 ....................................*/
+
+    /*.....................'A' ~ 0 , 'B' ~ 1, 'C' ~2 ....................*/
     for(i=0; i<M; i++){
       scanf("%s %ld %ld", m, &n, &cost);
+      MAXCOST+=cost;
       if(m[0]=='1'){                                        //supplier 1
           offers1[m[1]-65].push_back(make_tuple(cost, n));  //turn ascii to number
           m1+=cost;
@@ -122,21 +127,73 @@ int main(){
     }
 
     /* sort by cost */
-    for(int i =0; i<3; i++){
+    int s[4]={1,1,1,1};
+    for(int i = 0; i<3; i++){
       sort(offers1[i].begin(), offers1[i].end());
+      if(offers1[i].size()==1)
+          s[1] = 0;
       sort(offers2[i].begin(), offers2[i].end());
+      if(offers2[i].size()==1)
+          s[2] = 0;
       sort(offers3[i].begin(), offers3[i].end());
+      if(offers3[i].size()==1)
+          s[3] = 0;
     }
 
+    vector<long int> t1;
+    vector<long int> t2;
+    vector<long int> t3;
+    t1.push_back(0);
+    t2.push_back(0);
+    t3.push_back(0);
+
+    long int amount1 = 0, amount2 = 0, amount3 = 0;
+    if(s[1]>0){
+        amount1 = supplier(t1, 1, offers1, m1, N);
+    }
+    if(s[2]>0){
+        amount2 = supplier(t2, 2, offers2, m2, N);
+    }
+    if(s[3]>0){
+        amount3 = supplier(t3, 3, offers3, m3, N);
+    }
+    if(amount1 + amount2 + amount3 < N){        //we can't make N sets at any cost!
+      cout<<-1<<endl;
+      return 0;
+    }
+
+
+    //.............solve..............................//
     vector<vector<long int> > T(4);
     vector<long int> v{0};
     T.push_back(v);
-    for(int i=1; i<4;)
-        T[i].push_back(0);
-    supplier(T[1], 1, offers1, m1, N);
-    supplier(T[2], 2, offers2, m2, N);
-    supplier(T[3], 3, offers3, m3, N);
+    for(int i=0; i<4; i++)
+        T.push_back(v);
+
+    for(int k=0; k<N+1; k++)
+        T[1].push_back(t1[k]);
 
 
-
+    long int mini;
+    for(int i=2; i<4; i++){
+        if(s[i]==0){                  //can't produce any set from supplier i
+            for(int k=0; k<N+1; k++)
+                T[i].push_back(T[i-1][k]);
+        }
+        else{
+            T[i].push_back(0);        //T[i][0] = 0 for any set of suppliers
+            for(int k = 1; k<N+1; k++){
+                  mini = T[i-1][k];
+                  for(int j = 0; j < k+1; j++){
+                      if(i==2)
+                              mini = min(mini, t2[j] + T[i-1][k-j]);
+                      else
+                              mini = min(mini, t3[j] + T[i-1][k-j]);
+                   }
+                   T[i].push_back(mini);
+            }
+        }
+    }
+    cout << T[3][N] << flush << endl;
+    return 0;
 }
