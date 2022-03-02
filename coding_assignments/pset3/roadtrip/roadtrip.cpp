@@ -84,25 +84,12 @@ void Union(struct Set *uf, int u, int v, int w){
         uf[pu].real_parent = pv;
   }
 }
-//...........................
-// Depths of Nodes
-vector<int> level(N);
-const int LG = 20;
 
-// Parent at every 2^i level
-vector<vector<int> > dp(LG, vector<int>(N));
-
-// Maximum node at every 2^i level
-vector<vector<int> > mx(LG, vector<int>(N));
-
-// Graph that stores destinations
-// and its weight
-vector<vector<pair<int, int> > > G(N);
 int n;
 
 // Function to traverse the nodes
 // using the Depth-First Search Traversal
-void dfs_lca(int a, int par, int lev)
+void dfs_lca(vector<vector<int> > dp, vector<vector<int> > mx, vector<int> level, vector<vector<pair<int, int> > > G, int a, int par, int lev)
 {
     dp[0][a] = par;
     level[a] = lev;
@@ -120,7 +107,7 @@ void dfs_lca(int a, int par, int lev)
 }
 
 // Function to find the ansector
-void find_ancestor()
+void find_ancestor(vector<vector<int> > dp, vector<vector<int> > mx)
 {
 
     // Loop to set every 2^i distance
@@ -139,7 +126,7 @@ void find_ancestor()
     }
 }
 
-int getMax(int a, int b)
+int getMax( vector<vector<int> > mx, vector<int> level, int a, int b)
 {
     // Swaping if node a is at more depth
     // than node b because we will
@@ -202,7 +189,20 @@ int main()
   scanf("%d ",&N);
   scanf("%d",&M);
   getchar();
+  //...........................
+  // Depths of Nodes
+  vector<int> level(N);
+  const int LG = 20;
 
+  // Parent at every 2^i level
+  vector<vector<int> > dp(LG, vector<int>(N));
+
+  // Maximum node at every 2^i level
+   vector<vector<int> > mx(LG, vector<int>(N));
+c
+  // Graph that stores destinations
+  // and its weight
+  vector<vector<pair<int, int> > > G(N);
   Set *uf = new Set[N+1];
   for(i=1; i<N+1; i++){
 
