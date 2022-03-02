@@ -102,7 +102,7 @@ void dfs_lca(vector<vector<int> > dp, vector<vector<int> > mx, vector<int> level
         mx[0][i.first] = i.second;
 
         // DFS Recursive Call
-        dfs_lca(i.first, a, lev + 1);
+        dfs_lca(dp, mx, level, G, i.first, a, lev + 1);
     }
 }
 
