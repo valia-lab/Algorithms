@@ -126,7 +126,7 @@ void find_ancestor(vector<vector<int> > dp, vector<vector<int> > mx)
     }
 }
 
-int getMax( vector<vector<int> > mx, vector<int> level, int a, int b)
+int getMax(vector<vector<int> > dp, vector<vector<int> > mx, vector<int> level, int a, int b)
 {
     // Swaping if node a is at more depth
     // than node b because we will
