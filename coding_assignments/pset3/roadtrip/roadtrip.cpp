@@ -176,9 +176,9 @@ int getMax( vector<vector<int> > mx, vector<int> level, int a, int b)
 
 // Function to compute the Least
 // common Ansector
-void compute_lca()
+void compute_lca(vector<vector<int> > dp, vector<vector<int> > mx, vector<int> level, vector<vector<pair<int, int> > > G)
 {
-    dfs_lca(1, 0, 0);
+    dfs_lca(dp, mx, level, G, 1, 0, 0);
     find_ancestor();
 }
 
