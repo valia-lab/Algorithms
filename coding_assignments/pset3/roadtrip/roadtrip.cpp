@@ -11,6 +11,7 @@
 using namespace std;
 
 const int N = 100005;
+const int LG = 20;
 //...........................
 int tuple_partition(tuple<int, int, int> *a, int first, int last){
 
@@ -179,7 +180,7 @@ int getMax(vector<vector<int> > dp, vector<vector<int> > mx, vector<int> level, 
 void compute_lca(vector<vector<int> > dp, vector<vector<int> > mx, vector<int> level, vector<vector<pair<int, int> > > G)
 {
     dfs_lca(dp, mx, level, G, 1, 0, 0);
-    find_ancestor();
+    find_ancestor(dp, mx);
 }
 
 // Driver Code
@@ -192,17 +193,17 @@ int main()
   //...........................
   // Depths of Nodes
   vector<int> level(N);
-  const int LG = 20;
+
 
   // Parent at every 2^i level
   vector<vector<int> > dp(LG, vector<int>(N));
 
   // Maximum node at every 2^i level
    vector<vector<int> > mx(LG, vector<int>(N));
-c
+
   // Graph that stores destinations
   // and its weight
-  vector<vector<pair<int, int> > > G(N);
+  vector<vector<pair<int, int>>> G(N);
   Set *uf = new Set[N+1];
   for(i=1; i<N+1; i++){
 
@@ -242,14 +243,17 @@ c
   }
 
     // Computing LCA
-    compute_lca();
+    compute_lca(dp, mx, level, G);
 
     //.............................................
     //.............READ QUERIES....................//
     scanf("%d",&Q);
-    int queries[Q][2];
-    for(i=0; i<M; i++)
-      scanf("%d %d", &queries[i][0], &queries[i][1]);
+    vector<vector<int>> queries[Q][2];
+    for(i=0; i<M; i++){
+      scanf("%d %d", &t1, &t2);
+      queries[i][0] = t1;
+      queries[i][1] = t2;
+    }
     for (int i = 0; i < Q; i++) {
           int max_edge = getMax(queries[i][0],
                                 queries[i][1]);
